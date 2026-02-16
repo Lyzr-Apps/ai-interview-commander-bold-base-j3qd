@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { callAIAgent, uploadFiles } from '@/lib/aiAgent'
 import { cn } from '@/lib/utils'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Switch } from '@/components/ui/switch'
 import { Progress } from '@/components/ui/progress'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { FiSearch, FiFileText, FiUpload, FiDownload, FiMessageCircle, FiChevronRight, FiCheck, FiX, FiMaximize2, FiSend, FiBookOpen, FiTarget, FiUsers, FiTrendingUp, FiAward, FiClipboard, FiMap, FiZap, FiArrowRight, FiGlobe, FiBriefcase, FiFile, FiClock, FiChevronDown, FiChevronUp, FiLayers, FiShield, FiStar } from 'react-icons/fi'
+import { FiSearch, FiFileText, FiUpload, FiDownload, FiMessageCircle, FiCheck, FiX, FiMaximize2, FiSend, FiBookOpen, FiTarget, FiUsers, FiTrendingUp, FiAward, FiClipboard, FiMap, FiZap, FiArrowRight, FiGlobe, FiBriefcase, FiFile, FiClock, FiChevronDown, FiChevronUp, FiLayers, FiShield, FiStar } from 'react-icons/fi'
 
 // --- Constants ---
 const AGENT_IDS = {
@@ -80,7 +80,7 @@ interface ChatMessage {
   content: string
   mode?: string
   references?: string
-  suggestions?: string
+  suggestions?: string[]
 }
 
 interface DeliverableCard {
@@ -95,39 +95,48 @@ interface DeliverableCard {
 // --- Safe parse helper ---
 function safeParseResult(result: any): Record<string, any> {
   try {
+    if (!result) return {}
     const r = result?.response?.result
     if (!r) return {}
     if (typeof r === 'string') {
       try { return JSON.parse(r) } catch { return { text: r } }
     }
-    return r
+    if (typeof r === 'object') return r
+    return {}
   } catch { return {} }
 }
 
 function getArtifactFiles(result: any): ArtifactFile[] {
-  const files = result?.module_outputs?.artifact_files
-  if (Array.isArray(files)) return files
-  return []
+  try {
+    const files = result?.module_outputs?.artifact_files
+    if (Array.isArray(files)) return files
+    return []
+  } catch { return [] }
 }
 
 // --- Markdown Renderer ---
-function formatInline(text: string) {
+function formatInline(text: string): React.ReactNode {
   const parts = text.split(/\*\*(.*?)\*\*/g)
   if (parts.length === 1) return text
-  return parts.map((part, i) =>
-    i % 2 === 1 ? (
-      <strong key={i} className="font-semibold text-foreground">{part}</strong>
-    ) : (
-      <span key={i}>{part}</span>
-    )
+  return (
+    <React.Fragment>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <strong key={i} className="font-semibold text-foreground">{part}</strong>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </React.Fragment>
   )
 }
 
-function renderMarkdown(text: string) {
+function renderMarkdown(text: string): React.ReactNode {
   if (!text) return null
+  const lines = text.split('\n')
   return (
     <div className="space-y-2">
-      {text.split('\n').map((line, i) => {
+      {lines.map((line, i) => {
         if (line.startsWith('### '))
           return <h4 key={i} className="font-semibold text-sm mt-3 mb-1 font-serif tracking-wide" style={{ color: 'hsl(36 60% 31%)' }}>{line.slice(4)}</h4>
         if (line.startsWith('## '))
@@ -357,8 +366,8 @@ function DeliverableCardComponent({
   hasFiles: boolean
   onDownload?: () => void
 }) {
-  const preview = (deliverable.content ?? '').replace(/[#*\-]/g, '').trim().slice(0, 120)
-  const phaseInfo = PHASE_LABELS[deliverable.phase]
+  const preview = (deliverable.content || '').replace(/[#*\-]/g, '').trim().slice(0, 120)
+  const phaseInfo = PHASE_LABELS[deliverable.phase] ?? { label: 'Unknown', color: 'hsl(36 60% 31%)' }
 
   return (
     <Card
@@ -562,10 +571,14 @@ function CopilotPanel({
                         <p className="text-xs text-muted-foreground font-sans">{msg.references}</p>
                       </div>
                     )}
-                    {msg.suggestions && (
+                    {Array.isArray(msg.suggestions) && msg.suggestions.length > 0 && (
                       <div className="mt-2 pt-2 border-t border-border">
                         <p className="text-[10px] text-muted-foreground font-sans uppercase tracking-wider mb-1">Follow-up</p>
-                        <p className="text-xs text-muted-foreground font-sans">{msg.suggestions}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {msg.suggestions.map((sug, si) => (
+                            <span key={si} className="text-xs text-muted-foreground font-sans bg-secondary/60 px-2 py-0.5 rounded-full">{sug}</span>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -587,7 +600,7 @@ function CopilotPanel({
       </ScrollArea>
 
       {/* Suggestions from last response */}
-      {suggestions.length > 0 && (
+      {Array.isArray(suggestions) && suggestions.length > 0 && (
         <div className="px-4 py-2 border-t border-border flex-shrink-0">
           <div className="flex gap-1.5 overflow-x-auto pb-1">
             {suggestions.map((s, i) => (
@@ -677,7 +690,9 @@ export default function Page() {
   const deliverables = getDeliverables(effectiveResearch, effectiveDocuments, effectivePrep)
   const filteredDeliverables = activePhaseFilter === 'all' ? deliverables : deliverables.filter(d => d.phase === activePhaseFilter)
 
-  const companyName = companyUrl ? companyUrl.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0].split('.')[0] : 'Company'
+  const companyName = companyUrl
+    ? companyUrl.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]?.split('.')[0] || 'Company'
+    : 'Company'
 
   // Get files for a phase
   function getFilesForPhase(phase: string): ArtifactFile[] {
@@ -810,9 +825,9 @@ export default function Page() {
     setActiveAgentId(AGENT_IDS.copilot)
 
     try {
-      const researchCtx = JSON.stringify(effectiveResearch).slice(0, 1500)
-      const docsCtx = JSON.stringify(effectiveDocuments).slice(0, 1500)
-      const prepCtx = JSON.stringify(effectivePrep).slice(0, 1500)
+      const researchCtx = JSON.stringify(effectiveResearch || {}).slice(0, 1500)
+      const docsCtx = JSON.stringify(effectiveDocuments || {}).slice(0, 1500)
+      const prepCtx = JSON.stringify(effectivePrep || {}).slice(0, 1500)
 
       const copilotPrompt = `Mode: ${copilotMode}\nContext: Company=${companyName}, Role=${targetRole}.\nResearch Summary: ${researchCtx}\nDocuments Summary: ${docsCtx}\nPrep Summary: ${prepCtx}\n\nUser: ${userMessage}`
       const chatResult = await callAIAgent(copilotPrompt, AGENT_IDS.copilot)
@@ -821,21 +836,25 @@ export default function Page() {
         const parsed = safeParseResult(chatResult) as CopilotResponse
         const responseText = parsed?.response ?? (parsed as any)?.text ?? chatResult?.response?.message ?? 'I received your message but could not generate a proper response.'
 
+        // Parse follow-up suggestions into array
+        let sugList: string[] = []
+        if (parsed?.follow_up_suggestions) {
+          sugList = parsed.follow_up_suggestions
+            .split(/[,;\n]/)
+            .map((s: string) => s.trim())
+            .filter((s: string) => s.length > 5)
+            .slice(0, 3)
+        }
+
         setChatMessages(prev => [...prev, {
           role: 'assistant',
           content: typeof responseText === 'string' ? responseText : String(responseText),
           mode: parsed?.mode ?? copilotMode,
           references: parsed?.references ?? undefined,
-          suggestions: parsed?.follow_up_suggestions ?? undefined,
+          suggestions: sugList.length > 0 ? sugList : undefined,
         }])
 
-        // Parse follow-up suggestions
-        if (parsed?.follow_up_suggestions) {
-          const sugList = parsed.follow_up_suggestions.split(/[,;\n]/).map(s => s.trim()).filter(s => s.length > 5).slice(0, 3)
-          setChatSuggestions(sugList)
-        } else {
-          setChatSuggestions([])
-        }
+        setChatSuggestions(sugList)
       } else {
         setChatMessages(prev => [...prev, {
           role: 'assistant',
@@ -854,7 +873,9 @@ export default function Page() {
   }
 
   function handleFileDownload(fileUrl: string) {
-    window.open(fileUrl, '_blank')
+    if (fileUrl) {
+      window.open(fileUrl, '_blank')
+    }
   }
 
   // Progress percentage
@@ -1275,7 +1296,7 @@ export default function Page() {
           <DialogHeader className="flex-shrink-0">
             <div className="flex items-center gap-3">
               {expandedDeliverable && (
-                <div className="p-2 rounded-lg bg-secondary" style={{ color: PHASE_LABELS[expandedDeliverable.phase]?.color }}>
+                <div className="p-2 rounded-lg bg-secondary" style={{ color: (PHASE_LABELS[expandedDeliverable.phase] ?? { color: 'hsl(36 60% 31%)' }).color }}>
                   {expandedDeliverable.icon}
                 </div>
               )}
@@ -1284,7 +1305,7 @@ export default function Page() {
                   {expandedDeliverable?.title ?? 'Deliverable'}
                 </DialogTitle>
                 <DialogDescription className="font-sans text-xs">
-                  {expandedDeliverable ? PHASE_LABELS[expandedDeliverable.phase]?.label + ' Phase' : ''}
+                  {expandedDeliverable ? (PHASE_LABELS[expandedDeliverable.phase]?.label ?? 'Unknown') + ' Phase' : ''}
                 </DialogDescription>
               </div>
             </div>
