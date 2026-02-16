@@ -1,0 +1,20 @@
+{
+  "agent_name": "Interview Copilot Chat",
+  "agent_id": "6993421512539fd6994b5e83",
+  "description": "Elite Interview Strategy Advisor providing persistent conversational AI coaching grounded in all generated artifacts, supporting answer optimization, mock interviews, gap coaching, and strategic Q&A.",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "response": "string",
+    "mode": "string",
+    "references": "string",
+    "follow_up_suggestions": "string"
+  },
+  "example_response": {
+    "response": "sample string",
+    "mode": "sample string",
+    "references": "sample string",
+    "follow_up_suggestions": "sample string"
+  }
+}

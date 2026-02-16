@@ -1,0 +1,30 @@
+{
+  "agent_name": "Preparation & Simulation Coordinator",
+  "agent_id": "6993421510e4384f4eb4a070",
+  "description": "Interview Strategy Director coordinating question prediction, technical drilling, case strategy, and tactical planning to produce a unified preparation package.",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "question_bank": "string",
+    "technical_guide": "string",
+    "case_walkthroughs": "string",
+    "tactical_plan": "string",
+    "summary": "string"
+  },
+  "example_response": {
+    "question_bank": "sample string",
+    "technical_guide": "sample string",
+    "case_walkthroughs": "sample string",
+    "tactical_plan": "sample string",
+    "summary": "sample string"
+  },
+  "has_module_outputs": true,
+  "module_outputs_example": {
+    "artifact_files": [
+      {
+        "file_url": "https://example.com/file.pdf"
+      }
+    ]
+  }
+}

@@ -1,16 +1,16 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Cormorant } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { IframeLoggerInit } from '@/components/IframeLoggerInit'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { AgentInterceptorProvider } from '@/components/AgentInterceptorProvider'
 
-const inter = Inter({ subsets: ['latin'] })
+const cormorant = Cormorant({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700'] })
 
 export const metadata: Metadata = {
-  title: 'Next.js App',
-  description: 'Built with Next.js, React, and Tailwind CSS',
+  title: 'InterviewEdge AI - Private Interview Command Center',
+  description: 'AI-powered interview preparation platform with research, documents, preparation, and real-time coaching.',
   icons: {
     icon: '/lyzr.png',
   },
@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={cormorant.className}>
         <IframeLoggerInit />
         <ErrorBoundary>
           <AgentInterceptorProvider>

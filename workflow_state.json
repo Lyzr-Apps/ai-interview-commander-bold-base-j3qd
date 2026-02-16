@@ -1,0 +1,185 @@
+{
+  "project": "InterviewEdge AI - Private Interview Command Center",
+  "total_agents": 16,
+  "agents": {
+    "research_manager": {
+      "agent_id": "69934214bb2371e330b63d93",
+      "name": "Research & Intelligence Coordinator",
+      "type": "manager",
+      "file_output": true,
+      "provider": "OpenAI",
+      "model": "gpt-4.1",
+      "managed_agents": [
+        "6993419810e4384f4eb4a068",
+        "699341987b9217c149bede1a",
+        "699341994c7038d11b101477",
+        "6993419965a6fa76cd6171ce"
+      ]
+    },
+    "company_intel": {
+      "agent_id": "6993419810e4384f4eb4a068",
+      "name": "Company Intelligence Agent",
+      "type": "sub-agent",
+      "parent": "research_manager",
+      "provider": "Perplexity",
+      "model": "sonar-pro"
+    },
+    "competitive_landscape": {
+      "agent_id": "699341987b9217c149bede1a",
+      "name": "Competitive Landscape Agent",
+      "type": "sub-agent",
+      "parent": "research_manager",
+      "provider": "Perplexity",
+      "model": "sonar-pro"
+    },
+    "role_decomp": {
+      "agent_id": "699341994c7038d11b101477",
+      "name": "Role Decomposition Agent",
+      "type": "sub-agent",
+      "parent": "research_manager",
+      "provider": "Anthropic",
+      "model": "claude-sonnet-4-5"
+    },
+    "culture_sentiment": {
+      "agent_id": "6993419965a6fa76cd6171ce",
+      "name": "Culture & Sentiment Agent",
+      "type": "sub-agent",
+      "parent": "research_manager",
+      "provider": "Perplexity",
+      "model": "sonar-pro"
+    },
+    "docs_manager": {
+      "agent_id": "699342147b9217c149bede1e",
+      "name": "Strategic Documents Coordinator",
+      "type": "manager",
+      "file_output": true,
+      "provider": "OpenAI",
+      "model": "gpt-4.1",
+      "managed_agents": [
+        "699341e207d14187cc9991ca",
+        "699341e207d14187cc9991cc",
+        "699341e207d14187cc9991ce",
+        "699341e24c7038d11b10147b"
+      ]
+    },
+    "resume_strategist": {
+      "agent_id": "699341e207d14187cc9991ca",
+      "name": "Resume Strategist Agent",
+      "type": "sub-agent",
+      "parent": "docs_manager",
+      "provider": "OpenAI",
+      "model": "gpt-4.1"
+    },
+    "cover_letter": {
+      "agent_id": "699341e207d14187cc9991cc",
+      "name": "Cover Letter Agent",
+      "type": "sub-agent",
+      "parent": "docs_manager",
+      "provider": "OpenAI",
+      "model": "gpt-4.1"
+    },
+    "outreach_positioning": {
+      "agent_id": "699341e207d14187cc9991ce",
+      "name": "Outreach & Positioning Agent",
+      "type": "sub-agent",
+      "parent": "docs_manager",
+      "provider": "Anthropic",
+      "model": "claude-sonnet-4-5"
+    },
+    "behavioral_framing": {
+      "agent_id": "699341e24c7038d11b10147b",
+      "name": "Behavioral Framing Agent",
+      "type": "sub-agent",
+      "parent": "docs_manager",
+      "provider": "OpenAI",
+      "model": "gpt-4.1"
+    },
+    "prep_manager": {
+      "agent_id": "6993421510e4384f4eb4a070",
+      "name": "Preparation & Simulation Coordinator",
+      "type": "manager",
+      "file_output": true,
+      "provider": "OpenAI",
+      "model": "gpt-4.1",
+      "managed_agents": [
+        "699341e334e9a83c77a88abb",
+        "699341e365a6fa76cd6171d4",
+        "699341e3018dc5426a17ab36",
+        "699341e4bb2371e330b63d90"
+      ]
+    },
+    "question_gen": {
+      "agent_id": "699341e334e9a83c77a88abb",
+      "name": "Question Generator Agent",
+      "type": "sub-agent",
+      "parent": "prep_manager",
+      "provider": "Anthropic",
+      "model": "claude-sonnet-4-5"
+    },
+    "technical_drill": {
+      "agent_id": "699341e365a6fa76cd6171d4",
+      "name": "Technical Drill Agent",
+      "type": "sub-agent",
+      "parent": "prep_manager",
+      "provider": "Perplexity",
+      "model": "sonar-pro"
+    },
+    "case_strategy": {
+      "agent_id": "699341e3018dc5426a17ab36",
+      "name": "Case Strategy Agent",
+      "type": "sub-agent",
+      "parent": "prep_manager",
+      "provider": "Anthropic",
+      "model": "claude-sonnet-4-5"
+    },
+    "tactical_planner": {
+      "agent_id": "699341e4bb2371e330b63d90",
+      "name": "Tactical Planner Agent",
+      "type": "sub-agent",
+      "parent": "prep_manager",
+      "provider": "OpenAI",
+      "model": "gpt-4.1"
+    },
+    "copilot_chat": {
+      "agent_id": "6993421512539fd6994b5e83",
+      "name": "Interview Copilot Chat",
+      "type": "independent",
+      "provider": "Google",
+      "model": "gemini-2.5-pro"
+    }
+  },
+  "manager_subagent_mapping": {
+    "research_manager": {
+      "manager_id": "69934214bb2371e330b63d93",
+      "sub_agents": {
+        "company_intel": "6993419810e4384f4eb4a068",
+        "competitive_landscape": "699341987b9217c149bede1a",
+        "role_decomp": "699341994c7038d11b101477",
+        "culture_sentiment": "6993419965a6fa76cd6171ce"
+      }
+    },
+    "docs_manager": {
+      "manager_id": "699342147b9217c149bede1e",
+      "sub_agents": {
+        "resume_strategist": "699341e207d14187cc9991ca",
+        "cover_letter": "699341e207d14187cc9991cc",
+        "outreach_positioning": "699341e207d14187cc9991ce",
+        "behavioral_framing": "699341e24c7038d11b10147b"
+      }
+    },
+    "prep_manager": {
+      "manager_id": "6993421510e4384f4eb4a070",
+      "sub_agents": {
+        "question_gen": "699341e334e9a83c77a88abb",
+        "technical_drill": "699341e365a6fa76cd6171d4",
+        "case_strategy": "699341e3018dc5426a17ab36",
+        "tactical_planner": "699341e4bb2371e330b63d90"
+      }
+    }
+  },
+  "workflow": {
+    "nodes": 18,
+    "edges": 17,
+    "flow": "input_node -> research_manager -> [company_intel, competitive_landscape, role_decomp, culture_sentiment] -> docs_manager -> [resume_strategist, cover_letter, outreach_positioning, behavioral_framing] -> prep_manager -> [question_gen, technical_drill, case_strategy, tactical_planner] -> copilot_chat -> output_node"
+  }
+}
